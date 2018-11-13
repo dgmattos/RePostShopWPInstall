@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Instalador RepostShop Cliente</h1>
+
+            <div class="card">
+                <div class="card-header">POST</div>
+                <div class="card-body collapse">
+                    POST IN: setup-config.php?step=2
+                    dbname:O nome do seu banco de dados que você deseja utilizar com o WordPress. <br>
+                    uname:Nome de usuário <br>
+                    pwd:Senha do seu banco de dados.<br>
+                    dbhost:Você deve ser capaz de obter esta informação no seu servidor de hospedagem, caso localhost não funcione.<br>
+                    prefix:Se quiser rodar várias instalações WordPress em um unico banco de dados, mude isto.
+
+
+                    POST IN: install.php?step=2
+                    weblog_title: Título do site <br>
+                    user_name:Nome de usuário  do wp<br>
+                    pass1-text:Senha do usuario wp.<br>
+                    admin_email:Você deve ser capaz de obter esta informação no seu servidor de hospedagem, caso localhost não funcione.<br>
+                    prefix:Se quiser rodar várias instalações WordPress em um unico banco de dados, mude isto.
+                </div>
+            </div>
+
+
+            <div class="card mt-3">
+                <div class="card-header">Dados</div>
+                <form id="dados" action="shell.php" method="POST">
+                    <div class="card-body frm-dados">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h3>Dados para criação do banco</h3>
+                                <fieldset title="">
+                                    <legend>Nome do banco:</legend>
+                                    <input   type="text" name="dbname" id="dbname" placeholder="O nome do seu banco de dados que você deseja utilizar com o WordPress.">
+                                </fieldset>
+
+                                <fieldset title="Nome do banco">
+                                    <legend>Pasta de Instalção:</legend>
+                                    <input   type="text" name="client_name" id="client_name" placeholder="Nome cliente">
+                                </fieldset>
+
+                                <fieldset title="Nome de usuário">
+                                    <legend>Usuário do seu banco de dados:</legend>
+                                    <input   type="text" name="uname" id="uname" placeholder="Usuário do seu banco de dados.">
+                                </fieldset>
+
+                                <fieldset title="Nome de usuário">
+                                    <legend>Senha:</legend>
+                                    <input   type="text" name="pwd" id="pwd" placeholder="Senha do seu banco de dados.">
+                                </fieldset>
+
+                                <fieldset title="Nome de usuário">
+                                    <legend>Servidor do banco de dados</legend>
+                                    <input   type="text" name="dbhost" id="dbhost" placeholder="Você deve ser capaz de obter esta informação no seu servidor de hospedagem, caso localhost não funcione.">
+                                </fieldset>
+
+                                <input type="hidden" value="WP_" name="prefix" id="prefix"/>
+                            </div>
+                            <div class="col-sm-6">
+                                <h3>Dados para instalação do wp</h3>
+                                <fieldset>
+                                    <legend>Título do site</legend>
+                                    <input   type="text" name="weblog_title" id="weblog_title">
+                                </fieldset>
+
+                                <fieldset>
+                                    <legend>Nome de usuário</legend>
+                                    <input   type="text" name="user_name" id="user_login">
+                                </fieldset>
+
+                                <fieldset>
+                                    <legend>Senha</legend>
+                                    <input   type="text" name="pass1-text" id="pass1-text" value="05EHyaFR8VhSbuRe">
+                                </fieldset>
+
+                                <fieldset>
+                                    <legend>O seu e-mail</legend>
+                                    <input   type="email" name="admin_email" id="admin_email" value="05EHyaFR8VhSbuRe">
+                                </fieldset>
+
+                                <input name="blog_public" type="hidden" id="blog_public" value="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <button type="submit" class="btn btn-primary">Criar</button>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="resultado">
+                <b>Resultado</b>
+
+                <div class="progress">
+                    <div id="pg_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="width: 0%"></div>
+                </div>
+                <!-- OLD <iframe name="resultado" frameborder="0" width="100%" height="300px"></iframe> -->
+                <div class="resposta text-center">
+
+                </div>
+            </div>
+
+        </div>
+        <script src="js/jquery-3.3.1.slim.min.js" type="text/javascript"></script>
+        <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+        <script>
+            function AtualizaStatus(json) {
+                var p = $("</p>");
+
+                if (json.hasError == true) {
+                    p.addClass("alert alert-danger");
+                    p.html(json.msg);
+                    $(".resposta").append("<br/>");
+                    $(".resposta").append(p);
+                } else {
+                    p.addClass("alert alert-info");
+                    p.html(json.msg);
+                    $(".resposta").append("<br/>");
+                    $(".resposta").append(p);
+                }
+            }
+
+            function AtualizaStatusErro(msg) {
+                var p = $("</p>");
+
+                p.addClass("alert alert-warning");
+                p.html(msg);
+                $(".resposta").append("<br/>");
+                $(".resposta").append(p);
+            }
+
+            function StatusProcessando() {
+                $(".resposta").append("<br/>");
+                $(".resposta").append("Processando...");
+            }
+
+            function BarraDeProgresso(passo) {
+                var cp = (passo * 100) / 4;
+                $("#pg_bar").width(cp + "%");
+            }
+
+
+            // Cria o banco de dados
+            function Passo01() {
+                StatusProcessando();
+                try {
+                    $.post("shell.php?passo=1", $("#dados").serialize(), function (data) {
+
+                    }).done(function (data) {
+                        if (data.hasError == false) {
+                            BarraDeProgresso(1);
+                            setTimeout(function () {
+                                AtualizaStatus(data);
+
+                                //Executa o passo 2
+                                setTimeout(function () {
+                                    Passo02();
+                                });
+                            });
+                        } else {
+                            setTimeout(function () {
+                                AtualizaStatus(data);
+                            });
+                        }
+
+                    }).fail(function (data) {
+                        AtualizaStatusErro(data.responseText);
+                    }).always(function () {
+                        //Ação ao finalizar
+                    });
+                } catch (e) {
+                    AtualizaStatusErro(e);
+                }
+
+            }
+
+            function Passo02() {
+                StatusProcessando();
+                try {
+                    $.post("shell.php?passo=2", $("#dados").serialize(), function (data) {
+
+                    }).done(function (data) {
+                        if (data.hasError == false) {
+                            BarraDeProgresso(2);
+                            setTimeout(function () {
+                                AtualizaStatus(data);
+
+                                //Executa o passo 2
+                                setTimeout(function () {
+                                    Passo03();
+                                });
+                            });
+                        } else {
+                            setTimeout(function () {
+                                AtualizaStatus(data);
+                            });
+                        }
+
+                    }).fail(function (data) {
+                        AtualizaStatusErro(data.responseText);
+                    }).always(function () {
+                        //Ação ao finalizar
+                    });
+                } catch (e) {
+                    AtualizaStatusErro(e);
+                }
+
+            }
+
+            function Passo03() {
+                StatusProcessando();
+                try {
+                    $.post("shell.php?passo=3", $("#dados").serialize(), function (data) {
+
+                    }).done(function (data) {
+                        if (data.hasError == false) {
+                            BarraDeProgresso(3);
+                            setTimeout(function () {
+                                AtualizaStatus(data);
+
+                                //Executa o passo 2
+                                setTimeout(function () {
+                                    Passo04();
+                                });
+                            });
+                        } else {
+                            setTimeout(function () {
+                                AtualizaStatus(data);
+                            });
+                        }
+
+                    }).fail(function (data) {
+                        AtualizaStatusErro(data.responseText);
+                    }).always(function () {
+                        //Ação ao finalizar
+                    });
+                } catch (e) {
+                    AtualizaStatusErro(e);
+                }
+
+            }
+
+
+            function Passo04() {
+                StatusProcessando();
+                try {
+                    var client_name = $("#client_name").val();
+
+                    $.post("Clientes/" + client_name + "/wp-admin/setup-config.php?step=2", $("#dados").serialize(), function (data) {
+
+                    }).done(function (data) {
+                        BarraDeProgresso(4);
+                        setTimeout(function () {
+                            AtualizaStatusErro(data);
+
+                            //Executa o passo 2
+                            setTimeout(function () {
+                                Passo05();
+                            }, 1500);
+                        });
+
+                    }).fail(function (data) {
+                        AtualizaStatusErro(data.responseText);
+                    }).always(function () {
+                        //Ação ao finalizar
+                    });
+                } catch (e) {
+                    AtualizaStatusErro(e);
+                }
+
+            }
+
+
+            function Passo05() {
+                StatusProcessando();
+                try {
+
+                    var client_name = $("#client_name").val();
+
+                    $.post("Clientes/" + client_name + "/wp-admin/install.php?step=2", $("#dados").serialize(), function (data) {
+
+                    }).done(function (data) {
+                        BarraDeProgresso(5);
+                        setTimeout(function () {
+                            AtualizaStatusErro(data);
+
+                            //Executa o passo 2
+                            setTimeout(function () {
+                                //Passo03();
+                                window.alert("Fim!");
+                            },1500);
+                        });
+                    }).fail(function (data) {
+                        AtualizaStatusErro(data.responseText);
+                    }).always(function () {
+                        //Ação ao finalizar
+                    });
+                } catch (e) {
+                    AtualizaStatusErro(e);
+                }
+
+            }
+
+            $(document).ready(function () {
+                $("#dados").submit(function (e) {
+                    e.preventDefault();
+                    $(".frm-dados").slideUp(120);
+                    $(".resposta").html("O preocesso irá inciar em 2 segundos...");
+                    setTimeout(function () {
+                        Passo01();
+                    }, 2000);
+                });
+            });
+        </script>
+    </body>
+</html>
