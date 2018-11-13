@@ -18,7 +18,7 @@ if (isset($_GET['passo'])) {
             //Conexção com banco Usuário default do banco
             $db_connection["servername"] = "localhost";
             $db_connection["username"] = "root";
-            $db_connection["password"] = "del1202";
+            $db_connection["password"] = "";
 
             //Criando banco de dados
             $json = CriaBanco($db_connection, $_POST["dbname"]);
